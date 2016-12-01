@@ -1,7 +1,9 @@
 package com.smyc.kaftanis.lookingfortable;
 
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -26,7 +28,7 @@ public class VisiblePhotos extends DialogFragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.photos_on_details, null);
-        getDialog().setTitle("Do you want to see them?");
+        getDialog().setTitle("Θέλετε να εμφανίζονται;");
 
         button = (Button) view.findViewById(R.id.button5);
 
@@ -43,8 +45,8 @@ public class VisiblePhotos extends DialogFragment implements View.OnClickListene
 
 
 
-        aSwitch.setTextOn("Yes");
-        aSwitch.setTextOff("No");
+        aSwitch.setTextOn("Ναι");
+        aSwitch.setTextOff("Όχι");
 
         button.setOnClickListener(this);
 
@@ -61,8 +63,18 @@ public class VisiblePhotos extends DialogFragment implements View.OnClickListene
             editor.putString("value", Boolean.toString(yesno));
             editor.commit();
             dismiss();
-            Toast.makeText( getActivity() , "Done" , Toast.LENGTH_SHORT).show();
+            Toast.makeText( getActivity() , "Ολοκλήρωση" , Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setStyle(STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog_Alert);
+        }
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.setTitle("Θέλετε να εμφανίζονται;");
+        return dialog;
     }
 }

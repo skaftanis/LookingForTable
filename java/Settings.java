@@ -26,12 +26,12 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        setTitle("Settings");
+        setTitle("Ρυθμίσεις");
 
         listView = (ListView) findViewById(R.id.listView3);
         listView.setEnabled(true);
 
-        items = new String[]{"Set search radius (for pink button)", "Show photos on \"details\"", "Change nickname", "Change your image"};
+        items = new String[]{"Καθορίστε την ακτίνα αναζήτησης (για το ροζ κουμπί)", "Εμφάνιση εικόνων", "Αλλαγή ονόματος", "Αλλαγή εικόνας"};
 
         listItems=new ArrayList<>(Arrays.asList(items));
 
@@ -43,29 +43,29 @@ public class Settings extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                if (listItems.get(position).equals("Set search radius (for pink button)")) {
+                if (listItems.get(position).equals("Καθορίστε την ακτίνα αναζήτησης (για το ροζ κουμπί)")) {
                     SetRadius setRadius = new SetRadius();
                     setRadius.show(getFragmentManager(), "radius");
                 }
-                else if (listItems.get(position).equals("Show photos on \"details\"")) {
+                else if (listItems.get(position).equals("Εμφάνιση εικόνων")) {
                     VisiblePhotos visiblePhotos = new VisiblePhotos();
                     visiblePhotos.show(getFragmentManager(),"details");
                 }
-                else if (listItems.get(position).equals("Change nickname")) {
+                else if (listItems.get(position).equals("Αλλαγή ονόματος")) {
                     if (MainActivity.isLoged) {
                         ChangeNickName changeNickName = new ChangeNickName();
                         changeNickName.show(getFragmentManager(),"nickname");
                     }
                     else
-                        Toast.makeText( Settings.this , "You can't do this on guest mode" , Toast.LENGTH_SHORT).show();
+                        Toast.makeText( Settings.this , "Δεν μπορείτε να το κάνετε αυτό ως επισκέπτης" , Toast.LENGTH_SHORT).show();
                 }
-                else if (listItems.get(position).equals("Change your image")) {
+                else if (listItems.get(position).equals("Αλλαγή εικόνας")) {
                     if (MainActivity.isLoged) {
                         Intent intent = new Intent( Settings.this, AccountSettings.class);
                         startActivity(intent);
                     }
                     else
-                        Toast.makeText( Settings.this , "You can't do this on guest mode" , Toast.LENGTH_SHORT).show();
+                        Toast.makeText( Settings.this , "Δεν μπορείτε να το κάνετε αυτό ως επισκέπτης" , Toast.LENGTH_SHORT).show();
 
                 }
 

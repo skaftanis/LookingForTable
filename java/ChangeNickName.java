@@ -1,7 +1,9 @@
 package com.smyc.kaftanis.lookingfortable;
 
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -41,10 +43,10 @@ public class ChangeNickName extends DialogFragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.set_radius, null);
-        getDialog().setTitle("Set your new nickname");
+        getDialog().setTitle("Νέο όνομα χρήστη");
 
         editText = (EditText) view.findViewById(R.id.editText);
-        editText.setHint("Current is "+MainActivity.loginName);
+        editText.setHint("Το τωρινό είναι "+MainActivity.loginName);
 
         button = (Button) view.findViewById(R.id.button4);
 
@@ -59,10 +61,10 @@ public class ChangeNickName extends DialogFragment implements View.OnClickListen
 
         if (v.getId() == R.id.button4) {
             if (editText.getText().toString().equals("")){
-                Toast.makeText( getActivity() , "Please type your new nickname first" , Toast.LENGTH_SHORT).show();
+                Toast.makeText( getActivity() , "Παρακαλούμε πληκτρολογίστε το νέο σας όνομα χρήστη πρώτα" , Toast.LENGTH_SHORT).show();
             }
             else {
-                JSONproccess("PRIVATE" + MainActivity.loginName + "&newname=" + editText.getText().toString());
+                JSONproccess("--oldname=" + MainActivity.loginName + "&newname=" + editText.getText().toString());
 
             }
 
@@ -85,12 +87,12 @@ public class ChangeNickName extends DialogFragment implements View.OnClickListen
                             String error = jsonObject.getString("error");
 
                             if (error.equals("1")) {
-                                Toast.makeText(getActivity(), "This nickname already exists", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "Το όνομα αυτό υπάρχει ήδη", Toast.LENGTH_SHORT).show();
                                 editText.setText("");
                             }
                             else {
                                 MainActivity.loginName = editText.getText().toString();
-                                Toast.makeText(getActivity(), "Your nickname changed successfully", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "Το όνομα χρήστη άλλαξε με επιτυχία", Toast.LENGTH_SHORT).show();
                                 dismiss();
                             }
 
@@ -113,5 +115,15 @@ public class ChangeNickName extends DialogFragment implements View.OnClickListen
         requestQueue.add(jor);
 
 
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setStyle(STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog_Alert);
+        }
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.setTitle("Νέο όνομα χρήστη");
+        return dialog;
     }
 }

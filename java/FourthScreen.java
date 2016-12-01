@@ -25,7 +25,7 @@ public class FourthScreen extends AppCompatActivity {
                 SharedPreferences.Editor editor = shared.edit();
                 editor.putString("done", "1");
                 editor.apply();
-                Intent intent = new Intent(FourthScreen.this, MainActivity.class);
+                Intent intent = new Intent(FourthScreen.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
             }

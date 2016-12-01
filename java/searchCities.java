@@ -1,7 +1,9 @@
 package com.smyc.kaftanis.lookingfortable;
 
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -46,11 +48,13 @@ public class searchCities extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        getDialog().setTitle("Select your city");
+
+
+        getDialog().setTitle("Επιλέξτε πόλη");
         View view = inflater.inflate(R.layout.list_gps_dialog, null);
 
         listLabels = new ArrayList<String>();
-        listLabels.add("All");
+        listLabels.add("Όλες");
         listView = (ListView) view.findViewById(R.id.listView2);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -59,7 +63,7 @@ public class searchCities extends DialogFragment {
 
                 citySelected = listLabels.get(position);
                // Toast.makeText( getActivity(), citySelected + " selected", Toast.LENGTH_SHORT).show();
-                AdvancedSearch.city.setText("SELECT CITY ("+citySelected+" selected)");
+                AdvancedSearch.city.setText("ΕΠΕΞΕΛΕ ΠΟΛΗ ("+citySelected+")");
                 dismiss();
 
 
@@ -68,7 +72,7 @@ public class searchCities extends DialogFragment {
 
 
 
-        JSONproccess("PRIVATE");
+        JSONproccess("..getCities.php");
 
 
         return view;
@@ -126,5 +130,13 @@ public class searchCities extends DialogFragment {
     }
 
 
-
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setStyle(STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog_Alert);
+        }
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.setTitle("Επιλέξτε πόλη");
+        return dialog;
+    }
 }

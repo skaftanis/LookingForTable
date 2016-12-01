@@ -47,7 +47,7 @@ public class AccountSettings extends AppCompatActivity {
     private ImageView imageView;
     private Bitmap bitmap;
     private int PICK_IMAGE_REQUEST = 1;
-    private String UPLOAD_URL ="PRIVATE";
+    private String UPLOAD_URL ="--;
     private String KEY_IMAGE = "image";
     private String KEY_NAME = "name";
     private boolean wasHere=false;
@@ -73,14 +73,14 @@ public class AccountSettings extends AppCompatActivity {
 
         onCreateName=MainActivity.loginName;
 
-        setTitle("Account Settings");
+        setTitle("Αλλαγή εικόνας προφίλ");
         imageView = (ImageView) findViewById(R.id.imageView2);
         //buttonChoose = (Button) findViewById(R.id.button3);
         buttonUpload = (Button) findViewById(R.id.button3);
 
         progress = new ProgressDialog(this);
-        progress.setTitle("Loading");
-        progress.setMessage("Gettings your image...");
+        progress.setTitle("Φόρτωση");
+        progress.setMessage("Λήψη της φωτογραφίας σας...");
         progress.show();
         //download the right image and set it to the imageView
 
@@ -92,7 +92,7 @@ public class AccountSettings extends AppCompatActivity {
 
 
         new DownloadImageTask((ImageView) findViewById(R.id.imageView2))
-                .execute("PRIVATE");
+                .execute("--");
 
 
 
@@ -112,7 +112,7 @@ public class AccountSettings extends AppCompatActivity {
                     wasHere=false;
                 }
                 else
-                    Toast.makeText(AccountSettings.this, "Set a new image clicking the image above first" , Toast.LENGTH_LONG).show();
+                    Toast.makeText(AccountSettings.this, "Κάντε κλικ την τωρινή εικόνα σας για να επιλέξετε την επόμενη" , Toast.LENGTH_LONG).show();
             }
         });
 
@@ -124,7 +124,7 @@ public class AccountSettings extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        startActivityForResult(Intent.createChooser(intent, "Επιλέξτε φωτογραφία"), PICK_IMAGE_REQUEST);
     }
 
     @Override
@@ -154,7 +154,7 @@ public class AccountSettings extends AppCompatActivity {
 
     private void uploadImage(){
         //Showing the progress dialog
-        final ProgressDialog loading = ProgressDialog.show(this,"Uploading...","Please wait...",false,false);
+        final ProgressDialog loading = ProgressDialog.show(this,"Uploading...","Παρακαλώ περιμένετε...",false,false);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, UPLOAD_URL,
                 new Response.Listener<String>() {
                     @Override

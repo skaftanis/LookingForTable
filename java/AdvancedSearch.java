@@ -1,6 +1,8 @@
 package com.smyc.kaftanis.lookingfortable;
 
+import android.app.Dialog;
 import android.app.DialogFragment;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -22,7 +24,7 @@ public class AdvancedSearch extends DialogFragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.two_buttons, null);
-        getDialog().setTitle("Advanced Search");
+        getDialog().setTitle("Προχωρημένη Αναζήτηση");
 
         city = (Button) view.findViewById(R.id.city);
         kind = (Button) view.findViewById(R.id.kind);
@@ -32,8 +34,8 @@ public class AdvancedSearch extends DialogFragment implements View.OnClickListen
         kind.setOnClickListener(this);
         done.setOnClickListener(this);
 
-        searchCities.citySelected="All";
-        searchKind.kindSelected="All";
+        searchCities.citySelected="Όλες";
+        searchKind.kindSelected="Όλα";
 
 
         return view;
@@ -60,6 +62,18 @@ public class AdvancedSearch extends DialogFragment implements View.OnClickListen
 
         }
 
+    }
+
+
+    //για το bug που δε φαινόταν ο τίλος στο android 6+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setStyle(STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog_Alert);
+        }
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.setTitle("Προχωρημένη Αναζήτηση");
+        return dialog;
     }
 
 }

@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +36,8 @@ public class InsertSpots extends AppCompatActivity {
     String storeName;
     String size;
     String kind;
+    public static Switch entrance;
+
 
 
     //(public to use on ListItemDialo too)
@@ -61,19 +64,23 @@ public class InsertSpots extends AppCompatActivity {
         kind=extras.getString("kind");
 
 
-        JSONproccess("PRIVATE?id=" + storeID + "&user=" + MainActivity.loginId);
-        JSONproccess2("PRIVATE?id=" + storeID + "&user=" + MainActivity.loginId);
+        JSONproccess("-- + storeID + "&user=" + MainActivity.loginId);
+        JSONproccess2(" --+ storeID + "&user=" + MainActivity.loginId);
 
-        setTitle("Set spots for " + storeName);
+        setTitle(storeName);
 
         apprButoon = (at.markushi.ui.CircleButton) findViewById(R.id.view);
         exactButton = (at.markushi.ui.CircleButton) findViewById(R.id.view2);
         topTitle = (TextView) findViewById (R.id.topTitle);
+        entrance = (Switch) findViewById(R.id.eisodos);
+
+        entrance.setTextOn("Ναι");
+        entrance.setTextOff("Όχι");
 
         Typeface type = Typeface.createFromAsset(getAssets(),"fonts/Roboto_Light.ttf");
         topTitle.setTypeface(type);
 
-        topTitle.setText("How many free tables can you see on " + storeName + " ?");
+        topTitle.setText("Πόσα ελέυθερα τραπέζια βλέπετε στο " + storeName + " ?");
 
         apprButoon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +96,7 @@ public class InsertSpots extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (kind.equals("Club")){
-                    Toast.makeText(getApplicationContext(), "You can only set an approximation on clubs", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Μπορείτε να βάλετε μόνο εκτίμηση στα clubs", Toast.LENGTH_LONG).show();
                 }
                 else {
                     NumberChoiceDialog numberChoiceDialog = new NumberChoiceDialog();
@@ -122,7 +129,7 @@ public class InsertSpots extends AppCompatActivity {
         );
         requestQueue.add(jor);
 
-        Toast.makeText(getApplicationContext(), "Thanks for your commit", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Ευχαριστούμε για τη καταχώρηση", Toast.LENGTH_LONG).show();
         //Intent intent = new Intent(InsertSpots.this, SearchActivity.class);
         //startActivity(intent);
         //finish();

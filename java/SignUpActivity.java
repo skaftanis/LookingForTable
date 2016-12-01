@@ -9,8 +9,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -48,11 +51,17 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_sign_up);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-       // FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+
+
+
+        // FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
      //  fab.setOnClickListener(new View.OnClickListener() {
      //       @Override
      //       public void onClick(View view) {
@@ -66,10 +75,15 @@ public class SignUpActivity extends AppCompatActivity {
         nameE = (EditText) findViewById(R.id.nameField);
         passE2 = (EditText) findViewById(R.id.passwordField2);
 
-        mailE.setHint("Set your email");
-        passE.setHint("Set your password");
-        nameE.setHint("Set your username");
-        passE2.setHint("Retype your password");
+        mailE.setHint("Email");
+        passE.setHint("Κωδικός");
+        nameE.setHint("Όνομα χρήστη");
+        passE2.setHint("Επιβεβαίωση κωδικού");
+
+        passE.setTransformationMethod(new PasswordTransformationMethod());
+        passE2.setTransformationMethod(new PasswordTransformationMethod());
+
+
 
         Button singupButton = (Button) findViewById(R.id.button1);
 
@@ -87,8 +101,8 @@ public class SignUpActivity extends AppCompatActivity {
             //  mailE.setText(mailE.getText().toString().replace(" ","_"));
             if (mailE.getText().toString().equals("") || passE.getText().toString().equals("") || nameE.getText().toString().equals("")  )  {
                 new AlertDialog.Builder(getSingupActivity())
-                        .setTitle("Error")
-                        .setMessage("You need to complete all the fields")
+                        .setTitle("Σφάλμα")
+                        .setMessage("Πρέπει να συμπληρώσετε όλα τα πεδία")
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
@@ -97,8 +111,8 @@ public class SignUpActivity extends AppCompatActivity {
             }
             else if ( !isEmailValid(mailE.getText().toString())) {
                 new AlertDialog.Builder(getSingupActivity())
-                        .setTitle("Error")
-                        .setMessage("You need a valid email account")
+                        .setTitle("Σφάλμα")
+                        .setMessage("Πληκτρολογίστε έναν έγκυρο λογαριασμό email")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
@@ -108,8 +122,8 @@ public class SignUpActivity extends AppCompatActivity {
             }
             else if ( !passE.getText().toString().equals(passE2.getText().toString())) { //if retype is wrong
                 new AlertDialog.Builder(getSingupActivity())
-                        .setTitle("Error")
-                        .setMessage("Password doesn't match")
+                        .setTitle("Σφάλμα")
+                        .setMessage("Οι κωδικοί δεν ταιριάζουν")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
@@ -117,6 +131,17 @@ public class SignUpActivity extends AppCompatActivity {
                         .show();
                 passE.setText("");
                 passE2.setText("");
+            }
+            else if (nameE.getText().toString().contains("official") || nameE.getText().toString().contains("Official") || nameE.getText().toString().contains("επίσημο") || nameE.getText().toString().contains("Επίσημο") || nameE.getText().toString().contains("Επισημο") || nameE.getText().toString().contains("επισημο") ) {
+                new AlertDialog.Builder(getSingupActivity())
+                        .setTitle("Σφάλμα")
+                        .setMessage("Η λέξη \'Official\' δε μπορεί να χρησιμοποιηθεί στο όνομα χρήστη")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .show();
+                nameE.setText("");
             }
             else { //NO inut error (same email error (email is unique in database) below)
 
@@ -131,7 +156,7 @@ public class SignUpActivity extends AppCompatActivity {
                 else
                     tempLink=nameE.getText().toString();
 
-                JSONproccess("PRIVATE?name="+singupMail+"&nickname="+tempLink);
+                JSONproccess("..name="+singupMail+"&nickname="+tempLink);
 
             }
 
@@ -182,8 +207,8 @@ public class SignUpActivity extends AppCompatActivity {
                                     //insert the new user
                                     if (singupName.contains(" "))
                                         singupName=singupName.replace(" ", "%20");
-                                    JSONproccessInsert("PRIVATE?name=" + singupName + "&email=" + singupMail + "&pass=" + singupPass + "&rating=0.8&photo=NULL");
-                                    Toast.makeText(getApplicationContext(), "Account Created! Login to continue", Toast.LENGTH_LONG).show();
+                                    JSONproccessInsert("..?name=" + singupName + "&email=" + singupMail + "&pass=" + singupPass + "&rating=0.8&photo=NULL");
+                                    Toast.makeText(getApplicationContext(), "Ο λογαριασμός σας δημιουργήθηκε! Συνδεθείτε για να συνεχίσετε!", Toast.LENGTH_LONG).show();
                                     //autoLogin
                                     MainActivity.loginName=singupName;
                                     MainActivity.isLoged=true;
@@ -195,8 +220,8 @@ public class SignUpActivity extends AppCompatActivity {
                                 else { //the name exists already
 
                                     new AlertDialog.Builder(getSingupActivity())
-                                            .setTitle("Error")
-                                            .setMessage("Email or nickname already exists on database. Please use another!")
+                                            .setTitle("Σφάλμα")
+                                            .setMessage("Τo email ή το όνομα χρήστη σας υπάρχει ήδη! Παρακαλούμε χρησιμοποιείστε κάποιο άλλο")
                                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     //mailE.setText("");

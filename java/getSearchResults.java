@@ -1,8 +1,10 @@
 package com.smyc.kaftanis.lookingfortable;
 
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -25,6 +27,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 /**
@@ -51,7 +55,7 @@ public class getSearchResults extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        getDialog().setTitle("Results");
+        getDialog().setTitle("Αποτελέσματα");
         View view = inflater.inflate(R.layout.list_gps_dialog, null);
 
         listLabels = new ArrayList<String>();
@@ -66,25 +70,38 @@ public class getSearchResults extends DialogFragment {
                 selectedName = listLabels.get(position);
 
                 progress = new ProgressDialog(getActivity());
-                progress.setTitle("Loading");
-                progress.setMessage("Getting informations...");
+                progress.setTitle("Φόρτωση");
+                progress.setMessage("Λήψη πληροφοριών...");
                 progress.show();
 
-                String nameForLink = selectedName.replace(" ", "%20"); //fix the bug with spaces in name
-                JSONproccess2("PRIVATE" + nameForLink);
+                try {
+                    final String s = URLEncoder.encode(selectedName, "utf-8");
+                    String tempLink;
+                    if (s.contains(" "))
+                        tempLink=s.replace(" ","%20");
+                    else
+                        tempLink=s;
+                    JSONproccess2("--name=" + s);
+                  
+
+                } catch (UnsupportedEncodingException e ) {}
+
 
             }
         });
 
 
-        if (!searchCities.citySelected.equals("All") && !searchKind.kindSelected.equals("All"))
-            JSONproccess("PRIVATE?city=\"" + searchCities.citySelected + "\"&kind=\"" + searchKind.kindSelected+"\"");
-        if ( searchCities.citySelected.equals("All") && !searchKind.kindSelected.equals("All") )
-            JSONproccess("PRIVATEcity=town" + "&kind=\"" + searchKind.kindSelected +"\"");
-        if ( !searchCities.citySelected.equals("All") && searchKind.kindSelected.equals("All"))
-            JSONproccess("PRIVATE?city=\"" + searchCities.citySelected + "\"&kind=kind");
-        if ( searchCities.citySelected.equals("All") && searchKind.kindSelected.equals("All") )
-            JSONproccess("PRIVATE?city=town&kind=kind");
+        // Toast.makeText(this, cit  , Toast.LENGTH_LONG).show();
+
+
+        if (!searchCities.citySelected.equals("Όλες") && !searchKind.kindSelected.equals("Όλα"))
+            JSONproccess("--);
+        if ( searchCities.citySelected.equals("Όλες") && !searchKind.kindSelected.equals("Όλα") )
+            JSONproccess("--");
+        if ( !searchCities.citySelected.equals("Όλες") && searchKind.kindSelected.equals("Όλα"))
+            JSONproccess("--");
+        if ( searchCities.citySelected.equals("Όλες") && searchKind.kindSelected.equals("Όλα") )
+            JSONproccess("--");
 
 
 
@@ -114,7 +131,7 @@ public class getSearchResults extends DialogFragment {
 
                                 if (name.equals("SPACE")) {
                                     getDialog().setTitle("oops");
-                                    listLabels.add("There is no a place with these criteria");
+                                    listLabels.add("Δεν υπάρχει κάποιο τέτοιο ανοιχτό κατάστημα");
                                 }
                                 else
                                     listLabels.add(name);
@@ -172,6 +189,10 @@ public class getSearchResults extends DialogFragment {
                             String isOfficial = jsonObject.getString("isOfficial");
                             String kind = jsonObject.getString("kind");
                             selectedTown=jsonObject.getString("town");
+                            String strRating = jsonObject.getString("strRating");
+                            String forced = jsonObject.getString("forced");
+                            String entrace = jsonObject.getString("entrance");
+
 
 
                             progress.dismiss();
@@ -192,6 +213,9 @@ public class getSearchResults extends DialogFragment {
                             intent.putExtra("rating", rating);
                             intent.putExtra("isOfficial", isOfficial);
                             intent.putExtra("kind", kind);
+                            intent.putExtra("strRating", strRating);
+                            intent.putExtra("forced", forced);
+                            intent.putExtra("entrance", entrace);
                             startActivity(intent);
 
 
@@ -213,6 +237,17 @@ public class getSearchResults extends DialogFragment {
         requestQueue.add(jor);
 
     }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setStyle(STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog_Alert);
+        }
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.setTitle("Results");
+        return dialog;
+    }
+
 
 
 }

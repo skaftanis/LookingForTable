@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     TextView output ;
-    //String loginURL="https://lookingfortable-skaftanis.c9.io/getAllCustomers.php";
+
     String data = "";
 
     RequestQueue requestQueue;
@@ -92,8 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-       //output.setText(JSONproccess("https://lookingfortable-skaftanis.c9.io/getAllCustomers.php"));
-      //  JSONproccess("https://lookingfortable-skaftanis.c9.io/getAllCustomers.php");
+   
 
         //FacebookSdk.sdkInitialize(getApplicationContext());
 
@@ -119,9 +118,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            //finish();
             MainActivity.isLoged=false;
             loginName = null;
+            //finish();
             Intent intent = new Intent(MainActivity.this, SearchActivity.class);
             startActivity(intent);
 
@@ -134,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-           // finish();
+            //finish();
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
 

@@ -13,10 +13,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.app.AlertDialog;
 
@@ -31,6 +33,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +52,12 @@ public class LoginActivity extends AppCompatActivity {
 
     RequestQueue requestQueue;
 
+    String mail = null;
+    String pass = null;
+
+    TextView signup;
+    TextView guest;
+
 
     ProgressDialog progress;
 
@@ -61,24 +71,126 @@ public class LoginActivity extends AppCompatActivity {
 
         setTitle("LookingForTable");
 
+        SharedPreferences sharedPreferences0 = getSharedPreferences("tutorial", Context.MODE_PRIVATE);
+        String done = sharedPreferences0.getString("done", "0");
+
+        //first time
+        if (done.equals("0")) {
+            Intent intent = new Intent(this, FirstScreen.class);
+            startActivity(intent);
+            finish();
+        }
+
+
         mailE = (EditText) findViewById(R.id.mainField);
 
         passE = (EditText) findViewById(R.id.passwordField);
 
-        mailE.setHint("Enter your email");
-        passE.setHint("Enter Your Password");
+        signup = (TextView) findViewById(R.id.registerbtn);
+        guest =  (TextView) findViewById(R.id.guestbtn);
+
+        mailE.setHint("Email");
+        passE.setHint("Κωδικός");
+
+        passE.setTransformationMethod(new PasswordTransformationMethod());
+
 
         singupButton = (Button) findViewById(R.id.button1);
         singupButton.setClickable(true);
 
         singupButton.setOnClickListener(SingUpListener);
 
+
+        //έλεγχος για αυτόματη εισαγωγή του ονόματος και του κωδικού
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         String prmail = sharedPreferences.getString("email", "");
         String prpass = sharedPreferences.getString("pass", "");
         if (!prmail.equals("")) {
             mailE.setText(prmail);
             passE.setText(prpass);
+        }
+
+        signup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        guest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.isLoged=false;
+                MainActivity.loginName = null;
+                //finish();
+                Intent intent = new Intent(LoginActivity.this, SearchActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+        //το if αυτό για να μην εκτελείται όταν έχει γίνει intent στο firstScreen και δεν έχουν προλάβει να σεταριστούν τα preferences
+        if (!done.equals("0")) {
+
+            //έλεγχος για το αν πρέπει να αυξηθεί η πιθανότητα των διαφημίσεων. Αυξάνεται εάν το lastDay είναι πριν από τη σημερινή ημέρα
+            //Σημερινή ημερομηνία στο κατάλληλο format
+
+            Calendar c = Calendar.getInstance();
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+            String todayDate = df.format(c.getTime());
+
+
+            SharedPreferences sharedPreferences2 = getSharedPreferences("adsStaff", Context.MODE_PRIVATE);
+            String last = sharedPreferences2.getString("lastSet", "");
+            int setsToday = sharedPreferences2.getInt("setsToday", 0);
+            int prob = sharedPreferences2.getInt("prob", 0);
+            String lastDown = sharedPreferences2.getString("lastDown", "");
+
+           // Toast.makeText(getApplicationContext(), "TODAY DATE: " + todayDate, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "LAST: " + last, Toast.LENGTH_LONG).show();
+          //  Toast.makeText(getApplicationContext(), "PROB: " + prob, Toast.LENGTH_LONG).show();
+
+            //εάν η τελευταία μέρα που έχει γίνει DOWN η πιθανότητα (lastDown), δεν είναι η σημερινή τότε move on για τα σετ
+            if (!lastDown.equals(todayDate)) {
+                //αν η τελευταία ημερομηνία που έγινε set δεν είναι η σημερινή (δλδ είναι κάποια παλαιότερη), τότε αύξησε τη πιθανότητα DAYS_GAP*10 (με όριο το 70)
+                if (!todayDate.equals(last)) {
+                    int gap = 1;
+                    int newProb;
+                    //αν είναι στην αλλαγή του μήνα γλιτώνει το penalty
+                    int lastDay = Integer.parseInt(last.substring(0, 2));
+                    int nowDay = Integer.parseInt(todayDate.substring(0, 2));
+                    int lastMonth = Integer.parseInt(last.substring(3, 5));
+                    int nowMonth = Integer.parseInt(todayDate.substring(3, 5));
+
+                    if (lastMonth == nowMonth) {
+                        gap = (nowDay - lastDay) * 10;
+                    }
+                    //μην είναι πάνω από ένα μήνα διαφορά και δεν είμαστε στην αλλαγή του χρόνου
+                    else if (nowMonth - lastMonth < 2 && nowMonth > lastMonth) {
+                        gap = ((31 - lastDay) + nowDay) * 10;
+                    }
+                    //αν είμαστε στην αλλαγή του χρόνου
+                    else if (lastMonth > nowMonth && lastMonth == 12) {
+                        gap = (31 - lastDay + nowDay) * 10;
+                    } else  //αυθαίρετα μεγάλη για να πάει 70
+                        gap = 100;
+
+                    if (prob + gap > 70)
+                        newProb = 70;
+                    else
+                        newProb = prob + gap;
+
+                    SharedPreferences shared = getSharedPreferences("adsStaff", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = shared.edit();
+                    editor.putInt("prob", newProb);
+                    //βάλε τη σημερινή ημέρα ως την ημέρα που έγιναν οι τελευταίες μειώσεις
+                    editor.putString("lastDown",todayDate);
+                    editor.apply();
+
+                }
+            }
+
         }
 
 
@@ -98,8 +210,8 @@ public class LoginActivity extends AppCompatActivity {
             //if there is an empty field
             if (mailE.getText().toString().equals("") || passE.getText().toString().equals("") )  {
                 new AlertDialog.Builder(getSinginActivity())
-                        .setTitle("Error")
-                        .setMessage("You need to complete all the fields")
+                        .setTitle("Σφάλμα")
+                        .setMessage("Πρέπει να συμπληρώσετε όλα τα πεδία")
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
@@ -108,8 +220,8 @@ public class LoginActivity extends AppCompatActivity {
             } //if a mail isn't in the right format
             else if ( !isEmailValid(mailE.getText().toString())) {
                 new AlertDialog.Builder(getSinginActivity())
-                        .setTitle("Error")
-                        .setMessage("You need a valid email account")
+                        .setTitle("Σφάλμα")
+                        .setMessage("Πληκτρολογίστε έναν έγκυρο λογαριασμό email")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
@@ -123,12 +235,12 @@ public class LoginActivity extends AppCompatActivity {
                 signInPass=passE.getText().toString();
 
                 progress = new ProgressDialog(LoginActivity.this);
-                progress.setTitle("Loading");
-                progress.setMessage("Loggin in...");
+                progress.setTitle("Φόρτωση");
+                progress.setMessage("Σύνδεση...");
                 progress.show();
 
 
-                JSONproccess("PRIVATE?mail=" + mailE.getText().toString() + "&pass=" + passE.getText().toString());
+                JSONproccess("--mail=" + mailE.getText().toString() + "&pass=" + passE.getText().toString());
 
             }
 
@@ -156,6 +268,8 @@ public class LoginActivity extends AppCompatActivity {
 
     public void JSONproccess ( String loginURL ) {
 
+
+
         requestQueue = Volley.newRequestQueue(this);
         // output = (TextView) findViewById(R.id.jsonData);
         JsonObjectRequest jor = new JsonObjectRequest(Request.Method.GET, loginURL, null,
@@ -171,8 +285,8 @@ public class LoginActivity extends AppCompatActivity {
                                  jsonObject = ja.getJSONObject(0);
 
                                 String name = jsonObject.getString("nickname");
-                                String mail = jsonObject.getString("email");
-                                String pass = jsonObject.getString("password");
+                                mail = jsonObject.getString("email");
+                                pass = jsonObject.getString("password");
                                 String id= jsonObject.getString("id");
 
                                 //if we are ok (login succesfully)
@@ -198,30 +312,32 @@ public class LoginActivity extends AppCompatActivity {
                                                         editor.apply();
                                                         //intent to the search activity
                                                         progress.dismiss();
+                                                        finish();
                                                         Intent intent = new Intent(LoginActivity.this, SearchActivity.class);
                                                         startActivity(intent);
-                                                        Toast.makeText(getApplicationContext(), "Login Completed!", Toast.LENGTH_LONG).show();
+                                                        Toast.makeText(getApplicationContext(), "Συνδεθήκατε με επιτυχία!", Toast.LENGTH_SHORT).show();
                                                         break;
 
                                                     case DialogInterface.BUTTON_NEGATIVE:
                                                         progress.dismiss();
+                                                        finish();
                                                         Intent intent2 = new Intent(LoginActivity.this, SearchActivity.class);
                                                         startActivity(intent2);
-                                                        Toast.makeText(getApplicationContext(), "Login Completed!", Toast.LENGTH_LONG).show();
+                                                        Toast.makeText(getApplicationContext(), "Συνδεθήκατε με επιτυχία!", Toast.LENGTH_LONG).show();
                                                         break;
                                                 }
                                             }
                                         };
 
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                        builder.setMessage("Do you want to save these info?").setPositiveButton("Yes", dialogClickListener)
-                                                .setNegativeButton("No", dialogClickListener).show();
+                                        builder.setMessage("Θέλετε να αποθηκεύσετε τα στοιχεία αυτά στη συσκευή (για αυτόματη σύνδεση) ").setPositiveButton("Ναι", dialogClickListener)
+                                                .setNegativeButton("Όχι", dialogClickListener).show();
                                     } else {
                                         progress.dismiss();
+                                        finish();
                                         Intent intent = new Intent(LoginActivity.this, SearchActivity.class);
                                         startActivity(intent);
                                         //singupButton.setClickable(true);
-                                        Toast.makeText(getApplicationContext(), "Login Completed!", Toast.LENGTH_LONG).show();
                                     }
 
 
@@ -232,12 +348,21 @@ public class LoginActivity extends AppCompatActivity {
 
 
                                 }
-                                else
-                                    Toast.makeText(getApplicationContext(), "Wrong email or password!", Toast.LENGTH_LONG).show();
+                                //doen't work for some reason
+                                else {
+                                    progress.dismiss();
+                                    Toast.makeText(getApplicationContext(), "Λάθος email ή κωδικός!", Toast.LENGTH_LONG).show();
+                                }
 
 
 
                         }catch(JSONException e){e.printStackTrace();}
+                        //to fix the upper bug
+                        if ( !mail.equals(signInMail)  ||  !pass.equals(signInPass) ) {
+                            progress.dismiss();
+                            Toast.makeText(getApplicationContext(), "Λάθος email ή κωδικός!", Toast.LENGTH_LONG).show();
+                        }
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -248,7 +373,11 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
         );
+
         requestQueue.add(jor);
+
+
+
 
 
     }

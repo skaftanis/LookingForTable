@@ -1,10 +1,12 @@
 package com.smyc.kaftanis.lookingfortable;
 
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -53,7 +55,7 @@ public class ListGPSDialog extends DialogFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        getDialog().setTitle("Nearby stores with tables");
+        getDialog().setTitle("Κοντινά με τραπέζι");
 
         View view = inflater.inflate(R.layout.list_gps_dialog, null);
         listLabels = new ArrayList<String>();
@@ -71,12 +73,12 @@ public class ListGPSDialog extends DialogFragment{
 
 
                 progress = new ProgressDialog(getActivity());
-                progress.setTitle("Loading");
-                progress.setMessage("Getting informations...");
+                progress.setTitle("Φόρτωση");
+                progress.setMessage("Λήψη πληροφοριών...");
                 progress.show();
 
                 String nameForLink = selectedName.replace(" ", "%20"); //fix the bug with spaces in name
-                JSONproccess2("PRIVATE?name=" + nameForLink);
+                JSONproccess2("--name=" + nameForLink);
 
 
             }
@@ -84,12 +86,12 @@ public class ListGPSDialog extends DialogFragment{
 
         SharedPreferences prefs = getActivity().getBaseContext().getSharedPreferences("radius", getActivity().getBaseContext().MODE_PRIVATE);
 
-        SearchActivity.progress3.setMessage("Getting informations...");
+        SearchActivity.progress3.setMessage("Λήψη πληροφοριών...");
         if (prefs.getString("value","No name") == "No name") {
-            JSONproccess("PRIVATE?lat=" + SearchActivity.lat + "&lon=" + SearchActivity.lon + "&dis=0.62");
+            JSONproccess("--lat=" + SearchActivity.lat + "&lon=" + SearchActivity.lon + "&dis=0.62");
 
         } else {
-            JSONproccess("PRIVATE?lat=" + SearchActivity.lat + "&lon=" + SearchActivity.lon + "&dis=" + prefs.getString("value","No name"));
+            JSONproccess("--lat=" + SearchActivity.lat + "&lon=" + SearchActivity.lon + "&dis=" + prefs.getString("value","No name"));
         }
 
 
@@ -125,7 +127,7 @@ public class ListGPSDialog extends DialogFragment{
 
                                 if ( name.equals("SPACE") && address.equals("SPACE") ) {
                                     getDialog().setTitle("oops");
-                                    listLabels.add("There is no nearby store with available tables");
+                                    listLabels.add("Δεν υπάρχουν κοντινά κατατήματα με ελεύθερο τραπέζι");
                                 }
                                 else {
                                     label = name + ",\n" + address;
@@ -202,6 +204,10 @@ public class ListGPSDialog extends DialogFragment{
                             String isOfficial = jsonObject.getString("isOfficial");
                             String kind = jsonObject.getString("kind");
                             selectedTown=jsonObject.getString("town");
+                            String strRating = jsonObject.getString("strRating");
+                            String forced = jsonObject.getString("forced");
+                            String entrace = jsonObject.getString("entrance");
+
 
 
 
@@ -223,6 +229,10 @@ public class ListGPSDialog extends DialogFragment{
                             intent.putExtra("rating", rating);
                             intent.putExtra("isOfficial", isOfficial);
                             intent.putExtra("kind", kind);
+                            intent.putExtra("strRating", strRating);
+                            intent.putExtra("forced", forced);
+                            intent.putExtra("entrance", entrace);
+
                             startActivity(intent);
 
 
@@ -247,12 +257,15 @@ public class ListGPSDialog extends DialogFragment{
 
 
 
-
-
-
-
-
-
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setStyle(STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog_Alert);
+        }
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.setTitle("Κοντινά με τραπέζι");
+        return dialog;
+    }
 
 
 

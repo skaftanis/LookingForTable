@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,18 +44,24 @@ class CustomAdapter extends ArrayAdapter<String> {
         minuteAgo.setText(storeLog.minutes[position]);
         positions.setText(storeLog.positions[position]);
 
+        if (storeLog.officialPos != -1)
+            if (storeLog.officialPos == position) {
+                customView.setBackgroundColor(Color.parseColor("#BBDEFB"));
+            }
 
-        SharedPreferences prefs = getContext().getSharedPreferences("details", getContext().MODE_PRIVATE);
-        if (prefs.getString("value","No name").equals("true")) {
-            String tempLink;
-            if (storeLog.names[position].contains(" "))
-                tempLink = storeLog.names[position].replace(" ","%20");
-            else
-                tempLink=storeLog.names[position];
+            SharedPreferences prefs = getContext().getSharedPreferences("details", getContext().MODE_PRIVATE);
+            if (prefs.getString("value", "No name").equals("true")) {
+                String tempLink;
+                if (storeLog.names[position].contains(" "))
+                    tempLink = storeLog.names[position].replace(" ", "%20");
+                else
+                    tempLink = storeLog.names[position];
 
-            new DownloadImageTask(personImage)
-                    .execute("PRIVATE" + tempLink + ".png");
-        }
+                new DownloadImageTask(personImage)
+                        .execute("-- + tempLink + ".png");
+            }
+
+
 
 
         return customView;
@@ -90,6 +97,9 @@ class CustomAdapter extends ArrayAdapter<String> {
                 personImage.setImageResource(R.drawable.person);
             else
                 bmImage.setImageBitmap(result);
+
+            if (storeLog.officialPos != -1)
+                personImage.setImageResource(R.drawable.person);
         }
     }
 

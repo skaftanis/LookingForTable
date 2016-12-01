@@ -16,7 +16,7 @@ public class Memo extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        getDialog().setTitle("Memo");
+        getDialog().setTitle("Σημείωση");
         View view = inflater.inflate(R.layout.memo, null);
 
 
